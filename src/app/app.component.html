@@ -1,0 +1,25 @@
+<div *ngIf="!clickPdf">
+  <textarea class="center" rows="5" cols="30" pInputTextarea [(ngModel)]="question"></textarea>
+  <div class="flex-container">
+    <input type="text" pInputText [(ngModel)]="option1"/>
+    <input type="text" pInputText [(ngModel)]="option2"/>
+  </div>
+  <div class="flex-container">
+    <input type="text" pInputText [(ngModel)]="option3"/>
+    <input type="text" pInputText [(ngModel)]="option4"/>
+  </div>
+  <div class="flex-container">
+  <p-button label="Submit" (click)="saveQuestion($event)"></p-button>
+  <button pButton type="button" label="Generate PDF" class="p-button-help" (click)="generatePdf($event)"></button>
+  </div>
+</div>
+<div *ngIf="clickPdf">
+  <div *ngFor="let q of questionValue">
+    <div style="-webkit-column-break-inside: avoid">
+      <b>{{q['question']}}</b> <br>
+      <div style="display: inline-flex; font-size:13px; width:174px;">{{q['option']['1']}} {{q['option']['2']}}</div>
+      <div style="display: inline-flex; font-size:13px; width:87px;">{{q['option']['3']}} {{q['option']['4']}}</div>
+    </div>
+  </div>
+</div>
+
