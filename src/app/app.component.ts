@@ -17,6 +17,7 @@ export class AppComponent implements OnInit {
   clickPdf: boolean = false;
   constructor() { }
   ngOnInit(): void {
+    //dev
   }
 
   saveQuestion($event: MouseEvent) {
