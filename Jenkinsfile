@@ -4,7 +4,7 @@ pipeline {
         stage('checkout'){
             steps{
 checkout([$class: 'GitSCM',
-branches : scm.branches
+branches : scm.branches,
   doGenerateSubmoduleConfigurations: false,
   extensions: [[$class: 'RelativeTargetDirectory',
     relativeTargetDir: 'different_directory']],
