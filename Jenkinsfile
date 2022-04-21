@@ -3,10 +3,12 @@ pipeline {
     stages {
         stage('checkout'){
             steps{
-                checkout([
-                $class: 'GitSCM', 
-                // userRemoteConfigs: [[credentialsId: '<gitCredentials>', url: '<gitRepoURL>']],
-                ])
+        checkout([
+            $class: 'GitSCM',
+            branches: scm.branches,
+            extensions: scm.extensions + [[$class: 'LocalBranch'], [$class: 'WipeWorkspace']],
+            doGenerateSubmoduleConfigurations: false
+        ])
             }
         }
         stage('Test') {
