@@ -9,7 +9,7 @@ pipeline {
         stage('Test') {
             steps {
                 echo 'Testing..'
-                 sh "ls -lat"
+                 powershell returnStatus: true, script: "ls"
             }
         }
         stage('Deploy') {
