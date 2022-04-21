@@ -5,9 +5,6 @@ pipeline {
             steps{
                 checkout([
                 $class: 'GitSCM', 
-                doGenerateSubmoduleConfigurations: false, 
-                extensions: [[$class: 'CleanCheckout']], 
-                submoduleCfg: [], 
                 // userRemoteConfigs: [[credentialsId: '<gitCredentials>', url: '<gitRepoURL>']],
                 ])
             }
