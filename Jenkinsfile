@@ -9,7 +9,6 @@ pipeline {
                 extensions: [[$class: 'CleanCheckout']], 
                 submoduleCfg: [], 
                 // userRemoteConfigs: [[credentialsId: '<gitCredentials>', url: '<gitRepoURL>']],
-                location: [[cancelProcessOnExternalsFail: true, credentialsId: '65335887-e117-49bf-abd6-64c6436c4c8d',depthOption: 'infinity', ignoreExternalsOption: true,local: './CM_Scripts' ]]
                 ])
             }
         }
