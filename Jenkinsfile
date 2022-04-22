@@ -3,14 +3,9 @@ pipeline {
     stages {
         stage('Checkout'){
             steps{
-				// powershell returnStatus: true, script: "Remove-Item ./email.body -Force"
-				// powershell returnStatus: true, script: "Remove-Item ./new.tag -Force"
-				// powershell returnStatus: true, script: "Remove-Item ./tag.ver -Force"
-                // powershell returnStatus: true, script: '$CurrentDir = Get-Location; cd ..; Remove-Item $CurrentDir -Recurse -Force'
-                // powershell returnStatus: true, script: "ls"
                 step([$class: 'WsCleanup'])
                 checkout scm
-                checkout([$class: 'GitSCM'])
+                // checkout([$class: 'GitSCM'])
             }
         }
         stage('Copying files') {
