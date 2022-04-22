@@ -6,7 +6,7 @@ pipeline {
 				// powershell returnStatus: true, script: "Remove-Item ./email.body -Force"
 				// powershell returnStatus: true, script: "Remove-Item ./new.tag -Force"
 				// powershell returnStatus: true, script: "Remove-Item ./tag.ver -Force"
-                powershell returnStatus: true, script: "Get-Location"
+                powershell returnStatus: true, script: "$CurrentDir = Get-Location; cd ..; Remove-Item $CurrentDir -Recurse -Force"
                 powershell returnStatus: true, script: "ls"
                 checkout scm
                 checkout([$class: 'GitSCM'])
