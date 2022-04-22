@@ -5,7 +5,7 @@ pipeline {
             steps{
                 step([$class: 'WsCleanup'])
                 checkout scm
-                checkout([$class: 'GitSCM', branches:scm.branches])
+                checkout([$class: 'GitSCM'])
                 powershell returnStatus: true, script: "ls"
             }
         }      
