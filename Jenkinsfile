@@ -5,19 +5,20 @@ pipeline {
             steps{
                 step([$class: 'WsCleanup'])
                 checkout scm
+                checkout([$class: 'GitSCM', branches:scm.branches]),
                 powershell returnStatus: true, script: "ls"
             }
         }      
-        stage('Getting scripts from remote') {
-            steps{
-                powershell returnStatus: true, script: "mkdir scripts"
-                powershell returnStatus: true, script: "cd scripts"
-                checkout([$class: 'GitSCM', branches:[[name: '*/master']],
-                doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], 
-                userRemoteConfigs: [[url: "https://github.com/rizwan192/Leetcode-problem-picker.git"]]]) 
-                powershell returnStatus: true, script: "ls"
-            }
-        } 
+        // stage('Getting scripts from remote') {
+        //     steps{
+        //         powershell returnStatus: true, script: "mkdir scripts"
+        //         powershell returnStatus: true, script: "cd scripts"
+        //         checkout([$class: 'GitSCM', branches:[[name: '*/master']],
+        //         doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], 
+        //         userRemoteConfigs: [[url: "https://github.com/rizwan192/Leetcode-problem-picker.git"]]]) 
+        //         powershell returnStatus: true, script: "ls"
+        //     }
+        // } 
    
         stage('Copying files') {
             steps {
