@@ -5,13 +5,19 @@ pipeline {
             steps{
                 step([$class: 'WsCleanup'])
                 checkout scm
-                // checkout([$class: 'GitSCM'])
             }
-        }
+        }      
+        stage('Getting scripts from remote') {
+            steps{
+                checkout([$class: 'GitSCM', branches:[[name: '*/master']],
+                doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], 
+                userRemoteConfigs: [[url: "https://github.com/rizwan192/Leetcode-problem-picker.git"]]]) 
+            }
+        } 
+   
         stage('Copying files') {
             steps {
                 echo 'Copying...'
-
                  powershell returnStatus: true, script: "ls"
                  powershell returnStatus: true, script: "mkdir test"
                  powershell returnStatus: true, script: "Copy-Item 'C:/ProgramData/Jenkins/.jenkins/workspace/test/test.js' -Destination 'C:/ProgramData/Jenkins/.jenkins/workspace/test/test'"
