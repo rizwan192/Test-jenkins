@@ -5,6 +5,7 @@ pipeline {
             steps{
                 step([$class: 'WsCleanup'])
                 checkout scm
+                 powershell returnStatus: true, script: "ls"
             }
         }      
         stage('Getting scripts from remote') {
