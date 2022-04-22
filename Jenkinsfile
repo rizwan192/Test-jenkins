@@ -5,7 +5,9 @@ pipeline {
             steps{
                 step([$class: 'WsCleanup'])
                 checkout scm
-                checkout([$class: 'GitSCM'])
+                checkout([$class: 'GitSCM', branches:[[name: '*/master']],
+                doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], 
+                userRemoteConfigs: [[url: "https://github.com/rizwan192/Leetcode-problem-picker.git"]]]) 
                 powershell returnStatus: true, script: "ls"
             }
         }      
