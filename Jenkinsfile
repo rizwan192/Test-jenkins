@@ -10,7 +10,6 @@ pipeline {
                 checkout scm
             }
         }      
-
         stage('Copying Scripts from local dir to jenkins dir') {
             steps {
                 echo 'Copying Scripts...'
@@ -21,15 +20,15 @@ pipeline {
                  powershell returnStatus: true, script: "cd CM_Scripts"
                  powershell returnStatus: true, script: "ls"
             }
-                steps {
-                echo 'Copying Pacakges...'
-                 powershell returnStatus: true, script: "ls"
-                 powershell returnStatus: true, script: "mkdir CM_Package"
-                 powershell returnStatus: true, script: "Copy-Item 'C:/ProgramData/Jenkins/.jenkins/workspace/test/test.js' -Destination 'C:/ProgramData/Jenkins/.jenkins/workspace/test/test'"
-                 powershell returnStatus: true, script: "Get-Location"
-                 powershell returnStatus: true, script: "cd CM_Package"
-                 powershell returnStatus: true, script: "ls"
-            }
+            // steps {
+            //     echo 'Copying Pacakges...'
+            //      powershell returnStatus: true, script: "ls"
+            //      powershell returnStatus: true, script: "mkdir CM_Package"
+            //      powershell returnStatus: true, script: "Copy-Item 'C:/ProgramData/Jenkins/.jenkins/workspace/test/test.js' -Destination 'C:/ProgramData/Jenkins/.jenkins/workspace/test/test'"
+            //      powershell returnStatus: true, script: "Get-Location"
+            //      powershell returnStatus: true, script: "cd CM_Package"
+            //      powershell returnStatus: true, script: "ls"
+            // }
         }
 
 			// stage('Check JIRA') {
