@@ -17,7 +17,7 @@ pipeline {
                  powershell returnStatus: true, script: "ls"
                  powershell returnStatus: true, script: "mkdir CM_Scripts"
                  powershell returnStatus: true, script: "Copy-Item 'C:/ProgramData/Jenkins/.jenkins/workspace/test/test.js' -Destination 'C:/ProgramData/Jenkins/.jenkins/workspace/test/test'"
-                 powershell returnStatus: true, script: ${env.WORKSPACE}
+                 powershell returnStatus: true, script: "${env.WORKSPACE}"
                  powershell returnStatus: true, script: "cd CM_Scripts"
                  powershell returnStatus: true, script: "ls"
             }
