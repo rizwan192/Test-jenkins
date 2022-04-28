@@ -16,7 +16,7 @@ pipeline {
                  powershell returnStatus: true, script: "ls"
                  powershell returnStatus: true, script: "mkdir CM_Scripts"
                  powershell returnStatus: true, script: "mkdir CM_Package"
-                 powershell returnStatus: true, script: "Copy-Item -Force -Recurse -Verbose 'C:/Users/USER/Documents/GitHub/Test-jenkins/scripts/*' -Destination 'C:/ProgramData/Jenkins/.jenkins/workspace/test/CM_Scripts"
+                 powershell returnStatus: true, script: "Copy-Item -Force -Recurse -Verbose 'C:/Users/USER/Documents/GitHub/Test-jenkins/scripts/*' -Destination 'C:/ProgramData/Jenkins/.jenkins/workspace/test/CM_Scripts'"
                  powershell returnStatus: true, script: "Copy-Item -Force -Recurse -Verbose 'C:/Users/USER/Documents/GitHub/Test-jenkins/scripts/*' -Destination 'C:/ProgramData/Jenkins/.jenkins/workspace/test/CM_Package'"
                  powershell returnStatus: true, script: "echo '--------------------------------------------------------' "
                  powershell returnStatus: true, script: "ls"
