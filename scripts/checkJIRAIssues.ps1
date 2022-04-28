@@ -1,5 +1,8 @@
-param([string]$GIT_URL,[string]$GIT_BRANCH,[string]$cmadminUSER,[string]$cmadminPASS)
-$GIT_DIR = "E:\jenkins\workspace\ATMS-GitLab\R25.0.0\ATMS-Pipeline-FullBuild\demo-chart-atms-test\.git"
+param([string]$GIT_URL,[string]$GIT_BRANCH,[string]$GIT_DIR,[string]$cmadminUSER,[string]$cmadminPASS)
+# $GIT_DIR = "E:\jenkins\workspace\ATMS-GitLab\R25.0.0\ATMS-Pipeline-FullBuild\demo-chart-atms-test\.git"
+Write-Host "$GIT_URL"
+Write-Host "$GIT_BRANCH"
+Write-Host "$GIT_DIR"
 # Ensure the build fails if there is a problem.
 $ErrorActionPreference = 'Stop'
 
