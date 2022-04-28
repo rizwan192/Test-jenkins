@@ -19,7 +19,7 @@ pipeline {
                  powershell returnStatus: true, script: "Copy-Item 'C:/Users/USER/Documents/GitHub/Test-jenkins/scripts/checkJIRAIssues.ps1' -Destination 'C:/ProgramData/Jenkins/.jenkins/workspace/test/CM_Scripts'"
                  powershell returnStatus: true, script: "Copy-Item 'C:/Users/USER/Documents/GitHub/Test-jenkins/scripts/checkJIRAIssues.ps1' -Destination 'C:/ProgramData/Jenkins/.jenkins/workspace/test/CM_Package'"
                  powershell returnStatus: true, script: "echo '--------------------------------------------------------' "
-                 powershell returnStatus: true, script: "${env.WORKSPACE}"
+                //  powershell returnStatus: true, script: "${env.WORKSPACE}"
                  powershell returnStatus: true, script: "ls"
                  powershell returnStatus: true, script: ".\\CM_Scripts\\checkJIRAIssues.ps1 -GIT_URL ${env.GIT_URL} -GIT_BRANCH ${env.GIT_BRAN} -GIT_DIR ${env.WORKSPACE} -cmadminUSER ${env.USER} -cmadminPASS ${env.PASS}"
             }
