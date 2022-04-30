@@ -1,6 +1,5 @@
-param([string]$GIT_URL,[string]$GIT_BRANCH,[string]$GIT_DIR,[string]$cmadminUSER,[string]$cmadminPASS)
-# $GIT_DIR = "E:\jenkins\workspace\ATMS-GitLab\R25.0.0\ATMS-Pipeline-FullBuild\demo-chart-atms-test\.git"
-Write-Host "$GIT_URL"
+param([string]$GIT_BRANCH,[string]$GIT_DIR,[string]$cmadminUSER,[string]$cmadminPASS)
+$GIT_DIR = $GIT_DIR+"\.git"
 Write-Host "$GIT_BRANCH"
 Write-Host "$GIT_DIR"
 # Ensure the build fails if there is a problem.
@@ -17,7 +16,6 @@ $secure = $cmadminPASS | ConvertTo-SecureString -AsPlainText -Force
 $BSTR = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($secure)
 $unsecure = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto($BSTR)
 $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:{1}" -f $cmadminUSER,$unsecure)))
-
 
 ########################################################################################
 ########################################################################################
@@ -112,7 +110,7 @@ if ($tags.get_length() -gt 0) {
                 echo ">>> Issue $d was last tagged at revision $tagRev <<<"
                 $exist = git --git-dir=$GIT_DIR tag | findstr $tagName
                 if ($exist -ne '0') {
-                    $noOfChanges = $(git --git-dir=$GIT_DIR --work-tree=$PROJ_DIR diff $tagName --stat) | Measure-object -Line
+                    $noOfChanges = $(git --git-dir=$GIT_DIR --work-tree=$GIT_DIR diff $tagName --stat) | Measure-object -Line
                     if ($noOfChanges -eq '0') {
                         ">>> No new changes. Issue $d Not Updated <<<"
                     }

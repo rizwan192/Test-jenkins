@@ -11,18 +11,18 @@ pipeline {
 
 	agent any
 
-	//tools {
+	tools {
 	
-		// Install Gradle and add it to the path.
-		//gradle 'Gradle-7.3.3'
+		Install Gradle and add it to the path.
+		gradle 'Gradle-7.3.3'
 	  
-		// Install Ant and add it to the path.
-		//ant 'ANT1.9.6'
+		Install Ant and add it to the path.
+		ant 'ANT1.9.6'
 		
-		// Install JAVA JDK and add it to the path.
-		//jdk 'JDK15.0.2'
+		Install JAVA JDK and add it to the path.
+		jdk 'JDK15.0.2'
 	  
-		//}
+		}
 
 	stages {
 		stage('Checkout') {
@@ -180,7 +180,7 @@ pipeline {
 			
 			steps {
 				echo 'Building ATMS Package File into the Chocolatey Repo...'
-				powershell returnStatus: true, script: ".\\CM_Scripts\\packageOutput.ps1 -buildWorkspace ${env.WORKSPACE} -CHART_APP atms -SOURCE_URL 'svn+ssh://jira@10.222.118.87/usr/svn/chart-repos/chart/tags/${env.TAG_VER}'"
+				powershell returnStatus: true, script: ".\\CM_Scripts\\packageOutput.ps1 -buildWorkspace ${env.WORKSPACE} -CHART_APP atms -GIT_VER '${env.TAG_VER}'"
 				}
 				
 			}
