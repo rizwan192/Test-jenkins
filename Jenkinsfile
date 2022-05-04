@@ -15,7 +15,7 @@ pipeline {
                  powershell returnStatus: true, script: "mkdir CM_Scripts"
                  powershell returnStatus: true, script: "mkdir CM_Package"
                  powershell returnStatus: true, script: "Copy-Item -Force -Recurse -Verbose 'E:/jenkins/chart-cm/ATMS_Scripts/*' -Destination '${env.WORKSPACE}/CM_Scripts'"
-                 powershell returnStatus: true, script: "Copy-Item -Force -Recurse -Verbose 'E:/jenkins/chart-cm/chart-atms/tools/scripts/*' -Destination '${env.WORKSPACE}/CM_Package'"
+                 powershell returnStatus: true, script: "Copy-Item -Force -Recurse -Verbose 'E:/jenkins/chart-cm/chart-atms/*' -Destination '${env.WORKSPACE}/CM_Package'"
                  powershell returnStatus: true, script: "ls"
             }
         }
