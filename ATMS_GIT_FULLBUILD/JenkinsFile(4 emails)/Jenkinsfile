@@ -1,74 +1,83 @@
 #!groovy
 
 // Builds ATMS code with both Groovy (for core code) and ANT (for installation packages)
-	
 pipeline {
-
+	// Test env
 	environment {
-		EMAIL_TO = 'Delena.McFaddenMello@gdit.com,Scott.Dalrymple@gdit.com,Cesar.Cheng-Robles@gdit.com,Jay.Parsons@gdit.com,Randy.Jenkins2@gdit.com,Chidi.Azubike@gdit.com,Leonardo.Alves@gdit.com,Igor.Davydov@gdit.com,ANTHONY.JACKSON@gdit.com, Dan.Lindsay@gdit.com,Paul.Mink@gdit.com,Happy.Sahni@gdit.com,Nicholas.Posteraro@gdit.com,Etsegenet.Woldetensay@gdit.com,Sam.Jallad@gdit.com,Laura.Nicholas@gdit.com,Bryan.Norman@gdit.com,Rana.A.Almakabi@gdit.com,Muhammad.E.Zuhoor1@gdit.com,Tiffany.Holley@gdit.com,Oghenekevwe.Oberiko@gdit.com,Saqib.Bhuiyan@gdit.com,Vanitha.Ambati@gdit.com'
-		EMAIL_ERRORS = 'Delena.McFaddenMello@gdit.com,Cheng-Robles@gdit.com,Scott.Dalrymple@gdit.com,Jay.Parsons@gdit.com,Randy.Jenkins2@gdit.com,Bryan.Norman@gdit.com,Rana.A.Almakabi@gdit.com, Muhammad.E.Zuhoor1@gdit.com,Paul.Mink@gdit.com,Oghenekevwe.Oberiko@gdit.com,Saqib.Bhuiyan@gdit.com,Vanitha.Ambati@gdit.com'
+		EMAIL_TO = 'Delena.McFaddenMello@gdit.com,Oghenekevwe.Oberiko@gdit.com,Saqib.Bhuiyan@gdit.com, Paul.Nde@gdit.com'
+		EMAIL_ERRORS = 'Delena.McFaddenMello@gdit.com,Oghenekevwe.Oberiko@gdit.com,Saqib.Bhuiyan@gdit.com, Paul.Nde@gdit.com'
 		}
 
-	agent any
+    agent any
 
-	// tools {
-	
-	// 	Install Gradle and add it to the path.
-	// 	gradle 'Gradle-7.3.3'
-	  
-	// 	Install Ant and add it to the path.
-	// 	ant 'ANT1.9.6'
-		
-	// 	Install JAVA JDK and add it to the path.
-	// 	jdk 'JDK15.0.2'
-	  
-	// 	}
+	    //tools {
+    
+        // Install Gradle and add it to the path.
+        //gradle 'Gradle-7.3.3'
+      
+        // Install Ant and add it to the path.
+        //ant 'ANT1.9.6'
+        
+        // Install JAVA JDK and add it to the path.
+        //jdk 'JDK15.0.2'
+      
+        //}
 
-	stages {
-		stage('Checkout') {
+    stages {
+        stage('Checkout'){
 			steps {
-			    echo 'Cleaning up generated files...'
-				powershell returnStatus: true, script: "Remove-Item ./completed.array -Force"
-				powershell returnStatus: true, script: "Remove-Item ./email.body -Force"
-				powershell returnStatus: true, script: "Remove-Item ./new.tag -Force"
-				powershell returnStatus: true, script: "Remove-Item ./tag.ver -Force"
-				
+				//Checkout chart-atms target version
 				echo 'Getting Latest Code...'
 				checkout scm
 				
-				checkout([
-					$class: 'SubversionSCM',
-					additionalCredentials: [],
-					excludedCommitMessages: '',
-					excludedRegions: '',
-					excludedRevprop: '',
-					excludedUsers: '',
-					filterChangelog: false,
-					ignoreDirPropChanges: false,
-					includedRegions: '',
-					locations: [[cancelProcessOnExternalsFail: true, credentialsId: '65335887-e117-49bf-abd6-64c6436c4c8d', depthOption: 'infinity', ignoreExternalsOption: true, local: './CM_Scripts', remote: 'svn+ssh://jira@10.222.118.87/usr/svn/cm/Jenkins/ATMS_Scripts']],
-					quietOperation: true,
-					workspaceUpdater: [$class: 'CheckoutUpdater']])
+				//Checkout and Sparce the CM Jenkins ATMS Scripts from chart-cm to a specific directory(CM_Scripts) within the ATMS workspace
+				echo 'Checkout CM Scripts for ATMS'
+				checkout poll: false, 
+					scm: [$class: 'GitSCM', 
+					branches: [[name: '*/main']], 
+					extensions: [[$class: 'SparseCheckoutPaths', 
+					sparseCheckoutPaths: [[path: 'Jenkins/ATMS_Scripts/']]], 
+					[$class: 'RelativeTargetDirectory', relativeTargetDir: 'CM_Scripts']], 
+					userRemoteConfigs: [[credentialsId: 'e5c83089-b4d5-4ad9-ac85-4772980de4be', 
+					url: 'git@chartgitlab.chartdev.net:chartcm/cm.git']]]
 				
-				checkout([$class: 'SubversionSCM',
-					additionalCredentials: [],
-					excludedCommitMessages: '',
-					excludedRegions: '',
-					excludedRevprop: '',
-					excludedUsers: '',
-					filterChangelog: false,
-					ignoreDirPropChanges: false,
-					includedRegions: '',
-					locations: [[cancelProcessOnExternalsFail: true, credentialsId: '65335887-e117-49bf-abd6-64c6436c4c8d', depthOption: 'infinity', ignoreExternalsOption: true, local: './CM_Package', remote: 'svn+ssh://jira@10.222.118.87/usr/svn/cm/chocolatey/chart-atms']],
-					quietOperation: true,
-					workspaceUpdater: [$class: 'CheckoutUpdater']])
+				//Checkout and Sparce the CM chocolatey chart-atms from chart-cm to a specific directory (CM_Package) within the ATMS workspace 	
+				echo 'Checkout CM Package for chart-atms'
+				checkout poll: false, 
+					scm: [$class: 'GitSCM', 
+					branches: [[name: '*/main']], 
+					extensions: [[$class: 'RelativeTargetDirectory', 
+					relativeTargetDir: 'CM_Package'], 
+					[$class: 'SparseCheckoutPaths', 
+					sparseCheckoutPaths: [[path: 'chocolatey/chart-atms']]]], 
+					userRemoteConfigs: [[credentialsId: 'e5c83089-b4d5-4ad9-ac85-4772980de4be', 
+					url: 'git@chartgitlab.chartdev.net:chartcm/cm.git']]]
+				}
+        }
+
+		stage('Copy CM Files') {
+			steps {				
+				//Copy CM Scripts to root directory
+              	powershell returnStatus: true, script: "Copy-Item -Force -Recurse -Verbose '${env.WORKSPACE}//CM_Scripts//Jenkins//ATMS_Scripts//*' -Destination '${env.WORKSPACE}/CM_Scripts'"
+
+             	// Copy CM_Package to root directory
+              	powershell returnStatus: true, script: "Copy-Item -Force -Recurse -Verbose '${env.WORKSPACE}//CM_Package/chocolatey//chart-atms//*' -Destination '${env.WORKSPACE}/CM_Package'"				
 				}
 			}
+
+		stage('Remove unnecessary CM Files') {
+			steps {
+			  echo 'Removing unnecessary files...'
+			  powershell returnStatus: true, script: "Remove-Item '${env.WORKSPACE}//CM_Scripts//Jenkins' -Recurse -Force -Verbose"
+        	  powershell returnStatus: true, script: "Remove-Item '${env.WORKSPACE}//CM_Package//chocolatey' -Force -Recurse -Verbose"
+				}
+			}
+
 		stage('Check JIRA') {
 			steps {
 				echo 'Checking JIRA for ATMS tickets ready for deploy...'
 				withCredentials([usernamePassword(credentialsId: 'cmadminJIRA', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
-					powershell returnStatus: true, script: ".\\CM_Scripts\\checkJIRAIssues.ps1 -SVN_URL ${env.SVN_URL} -cmadminUSER ${env.USER} -cmadminPASS ${env.PASS}"
+					powershell returnStatus: true, script: ".\\CM_Scripts\\checkJIRAIssues.ps1 -GIT_BRANCH ${env.GIT_BRAN} -GIT_DIR ${env.WORKSPACE} -cmadminUSER ${env.USER} -cmadminPASS ${env.PASS}"
 					}
 				
 				// Use a script block to read variable set in the completed.array file
@@ -93,9 +102,7 @@ pipeline {
 					
 				}
 			}
-			
-		stage('Create Tag') {
-		
+           stage('Create Tag') {
 			when {
                 expression {
                     env.COMPLETED_ITEMS
@@ -103,7 +110,7 @@ pipeline {
 				}
 			
 			steps {
-				powershell returnStatus: true, script: ".\\CM_Scripts\\createTag.ps1 -SVN_URL ${env.SVN_URL} -COMPLETED_ITEMS '${env.COMPLETED_ITEMS}' -SVN_REVISION ${env.SVN_REVISION}"
+				powershell returnStatus: true, script: ".\\CM_Scripts\\createTag.ps1 -COMPLETED_ITEMS '${env.COMPLETED_ITEMS}' -GIT_BRANCH ${env.GIT_BRAN} -GIT_DIR ${env.WORKSPACE}"
 				
 				script {
 					def props = readProperties file: 'new.tag'
@@ -114,12 +121,10 @@ pipeline {
 					def props = readProperties file: 'tag.ver'
 					env.TAG_VER = props.TAG_VER
 					}
-				
 				}
-				
 			}
-			
-		stage('Code Build') {
+
+			stage('Code Build') {
 		
 			when {
                 expression {
@@ -128,13 +133,11 @@ pipeline {
 				}
 			
 			tools {
-	
 				// Install Gradle and add it to the path.
 				gradle 'Gradle-7.3.3'
 		
 				// Install JAVA JDK and add it to the path.
 				jdk 'JDK15.0.2'
-	  
 				}
 				
 			steps {
@@ -143,23 +146,22 @@ pipeline {
 				}
 				
 			}
-			
-		stage('Install Package Build') {
+
+		   stage('Install Package Build') {
 
 			when {
                 expression {
                     env.COMPLETED_ITEMS
+					env.TAG_VER
 					}
 				}
 			
 			tools {
-
 				// Install Gradle and add it to the path.
 				gradle 'Gradle-7.3.3'
 		
 				// Install JAVA JDK and add it to the path.
 				jdk 'JDK15.0.2'
-	  
 				}
 				
 			steps {
@@ -167,10 +169,10 @@ pipeline {
 				echo 'Building Install Packages With Gradle...'
 				bat "gradle :gradleproj:install:templates -PatmsVersion=${TAG_VER}"
 				}
-				
 			}
-			
-		stage('Build Package') {
+
+
+			stage('Build Package') {
 			
 			when {
                 expression {
@@ -180,12 +182,11 @@ pipeline {
 			
 			steps {
 				echo 'Building ATMS Package File into the Chocolatey Repo...'
-				powershell returnStatus: true, script: ".\\CM_Scripts\\packageOutput.ps1 -buildWorkspace ${env.WORKSPACE} -CHART_APP atms -GIT_VER '${env.TAG_VER}'"
-				}
+				powershell returnStatus: true, script: ".\\CM_Scripts\\packageOutput.ps1 -buildWorkspace ${env.WORKSPACE} -CHART_APP atms -TAG_VER '${env.TAG_VER}'"				}
 				
 			}
-			
-		stage('Deploy Package') {
+
+			stage('Deploy Package') {
 		
 			when {
                 expression {
@@ -200,9 +201,8 @@ pipeline {
 					}
 					
 				}
-				
 			}
-			
+
 		stage('Update JIRA') {
 		
 			when {
@@ -214,19 +214,16 @@ pipeline {
 			steps {
 				echo 'Updating JIRA tickets...'
 				withCredentials([usernamePassword(credentialsId: 'cmadminJIRA', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
-					powershell returnStatus: true, script: ".\\CM_Scripts\\updateJIRA.ps1 -SVN_URL ${env.SVN_URL} -TARGET_SERVER ${env.TARGET_SERVER} -cmadminUSER ${env.USER} -cmadminPASS ${env.PASS} -TAG_NAME ${env.TAG_NAME} -COMPLETED_ITEMS '${env.COMPLETED_ITEMS}'"
+					powershell returnStatus: true, script: ".\\CM_Scripts\\updateJIRA.ps1 -TARGET_SERVER ${env.TARGET_SERVER} -cmadminUSER ${env.USER} -cmadminPASS ${env.PASS} -TAG_NAME ${env.TAG_VER} -COMPLETED_ITEMS '${env.COMPLETED_ITEMS}'"
 					}
 
 				script {
 					def props = readProperties file: 'email.body'
 					env.EMAIL_BODY = props.EMAIL_BODY
 					}
-				
 				}
-				
 			}
-			
-		}
+    }
 		post {
 			success {
 				emailext body: "${EMAIL_BODY}", 
@@ -245,5 +242,4 @@ pipeline {
 					subject: 'Unstable build in Jenkins: $PROJECT_NAME - #$BUILD_NUMBER'
 				}
 			}
-		
-	}
+}

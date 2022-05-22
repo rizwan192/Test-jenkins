@@ -1,5 +1,4 @@
 param([string]$TAG_VER,[string]$TARGET_SERVER,[string]$USERNAME,[string]$PASSWORD)
-
 $ErrorActionPreference = 'Stop'
 $SecurePassword = $PASSWORD | ConvertTo-SecureString -AsPlainText -Force
 $cred = New-Object System.Management.Automation.PSCredential -ArgumentList $USERNAME, $SecurePassword

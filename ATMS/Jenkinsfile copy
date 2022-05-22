@@ -1,0 +1,117 @@
+#!groovy
+
+// Builds ATMS code with both Groovy (for core code) and ANT (for installation packages)
+
+pipeline {
+
+    environment {
+        EMAIL_TO = 'Delena.McFaddenMello@gdit.com,Scott.Dalrymple@gdit.com,Cesar.Cheng-Robles@gdit.com,Jay.Parsons@gdit.com,Randy.Jenkins2@gdit.com,Bryan.Norman@gdit.com,Rana.A.Almakabi@gdit.com,Muhammad.E.Zuhoor1@gdit.com,Paul.Mink@gdit.com,Oghenekevwe.Oberiko@gdit.com,Saqib.Bhuiyan@gdit.com,Vanitha.Ambati@gdit.com'
+        //EMAIL_TO = 'Delena.McFaddenMello@gdit.com'
+        }
+
+    agent any
+
+    //tools {
+
+        // Install Gradle and add it to the path.
+        //gradle 'Gradle-7.3.3'
+
+        // Install Ant and add it to the path.
+        //ant 'ANT1.9.6'
+
+        // Install JAVA JDK and add it to the path.
+        //jdk 'JDK15.0.2'
+
+        //}
+
+    stages {
+        stage('Checkout') {
+            steps {
+                echo 'Getting Latest Code...'
+                checkout scm
+
+                checkout([
+                    $class: 'SubversionSCM',
+                    additionalCredentials: [],
+                    excludedCommitMessages: '',
+                    excludedRegions: '',
+                    excludedRevprop: '',
+                    excludedUsers: '',
+                    filterChangelog: false,
+                    ignoreDirPropChanges: false,
+                    includedRegions: '',
+                    locations: [[cancelProcessOnExternalsFail: true, credentialsId: '65335887-e117-49bf-abd6-64c6436c4c8d', depthOption: 'infinity', ignoreExternalsOption: true, local: './CM_Scripts', remote: 'svn+ssh://jira@10.222.118.87/usr/svn/cm/Jenkins/ATMS_Scripts']],
+                    quietOperation: true,
+                    workspaceUpdater: [$class: 'CheckoutUpdater']])
+
+                checkout([$class: 'SubversionSCM',
+                    additionalCredentials: [],
+                    excludedCommitMessages: '',
+                    excludedRegions: '',
+                    excludedRevprop: '',
+                    excludedUsers: '',
+                    filterChangelog: false,
+                    ignoreDirPropChanges: false,
+                    includedRegions: '',
+                    locations: [[cancelProcessOnExternalsFail: true, credentialsId: '65335887-e117-49bf-abd6-64c6436c4c8d', depthOption: 'infinity', ignoreExternalsOption: true, local: './CM_Package', remote: 'svn+ssh://jira@10.222.118.87/usr/svn/cm/chocolatey/chart-atms']],
+                    quietOperation: true,
+                    workspaceUpdater: [$class: 'CheckoutUpdater']])
+                }
+            }
+        stage('Code Build') {
+            tools {
+
+                // Install Gradle and add it to the path.
+                gradle 'Gradle-7.3.3'
+
+                // Install JAVA JDK and add it to the path.
+                jdk 'JDK15.0.2'
+
+                }
+            steps {
+                echo 'Building Code With Gradle...'
+                bat "gradle build -PatmsVersion=${BUILD_VER}"
+                }
+            }
+        stage('Install Package Build') {
+            tools {
+
+                // Install Gradle and add it to the path.
+                gradle 'Gradle-7.3.3'
+
+                // Install JAVA JDK and add it to the path.
+                jdk 'JDK15.0.2'
+
+                }
+            steps {
+                powershell returnStatus: true, script: "Remove-Item ./install/output -Force -Recurse"
+                echo 'Building Install Packages With Gradle...'
+                bat "gradle :gradleproj:install:${BUILD_TARGET} -PatmsVersion=${BUILD_VER}"
+                }
+            }
+        stage('Build Package') {
+            steps {
+                echo 'Building ATMS Package File into the Chocolatey Repo...'
+                powershell returnStatus: true, script: ".\\CM_Scripts\\packageOutput.ps1 -buildWorkspace ${env.WORKSPACE} -CHART_APP atms -SOURCE_URL ${env.SVN_URL}"
+                }
+            }
+        }
+        post {
+            failure {
+                emailext body: 'Check console output at $BUILD_URL to view the results. \n\n ${CHANGES} \n\n -------------------------------------------------- \n${BUILD_LOG, maxLines=100, escapeHtml=false}',
+                    to: "${EMAIL_TO}",
+                    subject: 'Build failed in Jenkins: $PROJECT_NAME - #$BUILD_NUMBER'
+                }
+            unstable {
+                emailext body: 'Check console output at $BUILD_URL to view the results. \n\n ${CHANGES} \n\n -------------------------------------------------- \n${BUILD_LOG, maxLines=100, escapeHtml=false}',
+                    to: "${EMAIL_TO}",
+                    subject: 'Unstable build in Jenkins: $PROJECT_NAME - #$BUILD_NUMBER'
+                }
+            changed {
+                emailext body: 'Check console output at $BUILD_URL to view the results.',
+                    to: "${EMAIL_TO}",
+                    subject: 'Jenkins build status has Changed: $PROJECT_NAME - #$BUILD_NUMBER'
+                }
+            }
+
+    }

@@ -1,0 +1,105 @@
+#!groovy
+
+// Builds ATMS code with both Groovy (for core code) and ANT (for installation packages)
+pipeline {
+  
+	environment {
+	EMAIL_TO = 'Delena.McFaddenMello@gdit.com,Oghenekevwe.Oberiko@gdit.com,Saqib.Bhuiyan@gdit.com,Paul.Nde@gdit.com'
+	//EMAIL_TO = 'Delena.McFaddenMello@gdit.com'
+	}
+
+
+    agent any
+
+	    //tools {
+    
+        // Install Gradle and add it to the path.
+        //gradle 'Gradle-7.3.3'
+      
+        // Install Ant and add it to the path.
+        //ant 'ANT1.9.6'
+        
+        // Install JAVA JDK and add it to the path.
+        //jdk 'JDK15.0.2'
+      
+        //}
+
+    stages {
+        stage('Checkout'){
+            steps{
+                echo 'Cleaning up generated files...'
+                echo 'Getting Latest Code...'
+                checkout scm
+            }
+        }
+        stage('Copying Scripts') {
+            steps {
+                echo 'Copying Scripts...'
+                 powershell returnStatus: true, script: "ls"
+                 powershell returnStatus: true, script: "mkdir CM_Scripts"
+                 powershell returnStatus: true, script: "mkdir CM_Package"
+                 powershell returnStatus: true, script: "Copy-Item -Force -Recurse -Verbose 'E:/jenkins/chart-cm/ATMS_Scripts/*' -Destination '${env.WORKSPACE}/CM_Scripts'"
+                 powershell returnStatus: true, script: "Copy-Item -Force -Recurse -Verbose 'E:/jenkins/chart-cm/chart-atms/*' -Destination '${env.WORKSPACE}/CM_Package'"
+                 powershell returnStatus: true, script: "ls"
+            }
+        }
+		stage('Code Build') {
+		
+			tools {
+				// Install Gradle and add it to the path.
+				gradle 'Gradle-7.3.3'
+		
+				// Install JAVA JDK and add it to the path.
+				jdk 'JDK15.0.2'
+				}
+				
+			steps {
+				echo 'Building Code With Gradle...'
+				bat "gradle build -PatmsVersion=${BUILD_VER}"
+				}
+				
+			}
+
+		   stage('Install Package Build') {
+
+			tools {
+				// Install Gradle and add it to the path.
+				gradle 'Gradle-7.3.3'
+		
+				// Install JAVA JDK and add it to the path.
+				jdk 'JDK15.0.2'
+				}
+				
+			steps {
+				echo 'Building Install Packages With Gradle...'
+			    bat "gradle :gradleproj:install:${BUILD_TARGET} -PatmsVersion=${BUILD_VER}"
+				}
+			}
+
+
+			stage('Build Package') {
+
+			steps {
+				echo 'Building ATMS Package File into the Chocolatey Repo...'
+				powershell returnStatus: true, script: ".\\CM_Scripts\\packageOutput.ps1 -buildWorkspace ${env.WORKSPACE} -CHART_APP atms -TAG_VER '${env.BUILD_VER}'"				}
+				
+			}
+    }
+        post {
+            failure {
+                emailext body: 'Check console output at $BUILD_URL to view the results. \n\n ${CHANGES} \n\n -------------------------------------------------- \n${BUILD_LOG, maxLines=100, escapeHtml=false}',
+                    to: "${EMAIL_TO}",
+                    subject: 'Build failed in Jenkins: $PROJECT_NAME - #$BUILD_NUMBER'
+                }
+            unstable {
+                emailext body: 'Check console output at $BUILD_URL to view the results. \n\n ${CHANGES} \n\n -------------------------------------------------- \n${BUILD_LOG, maxLines=100, escapeHtml=false}',
+                    to: "${EMAIL_TO}",
+                    subject: 'Unstable build in Jenkins: $PROJECT_NAME - #$BUILD_NUMBER'
+                }
+            changed {
+                emailext body: 'Check console output at $BUILD_URL to view the results.',
+                    to: "${EMAIL_TO}",
+                    subject: 'Jenkins build status has Changed: $PROJECT_NAME - #$BUILD_NUMBER'
+                }
+            }
+}
